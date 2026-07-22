@@ -1,6 +1,8 @@
 const model= import.meta.env.VITE_MODEL;
 const ollamaUrl= import.meta.env.VITE_URL_API_OLLAMA;
 
+console.log(ollamaUrl,model)
+
 export const  fetchApi = async (message) => {
     
     const requestBody={

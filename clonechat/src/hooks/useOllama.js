@@ -12,7 +12,7 @@ export const useOllama = () => {
 
       setLoading(true);
       const result = await fetchApi(msg);
-      setResponses(result);
+      setResponses(result.response);
     
     } catch (err) {
       setError(err);
