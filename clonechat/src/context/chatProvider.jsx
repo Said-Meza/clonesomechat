@@ -1,6 +1,6 @@
 import { useReducer } from "react"
 import { initialState } from "../reducers/ChatReducer"
-import { chatReducer } from "../reducers/ChatReducer"
+import { chatReducer } from "../reducers/chatReducer"
 import { ChatContext } from "./ChatContext"
 
 

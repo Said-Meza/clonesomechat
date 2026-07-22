@@ -1,17 +1,28 @@
-import { useEffect } from "react";
-import { useOllama } from "./hooks/useOllama"
+import { useContext, useEffect } from "react";
+import { ChatContext } from "./context/ChatContext";
+
 
 
 function App() {
+  const {state,dispatch} = useContext(ChatContext)
 
-  const{sendPrompt, responses, loading, error}= useOllama();
-
- useEffect(() => {
-    sendPrompt("¿Quién fue María Josefa Ortiz de Domínguez?");
-}, []);
-
-  console.log(responses)
-
+  useEffect(() => {
+    
+    dispatch(
+      {
+        type: "ADD_MESSAGE",
+        payload: {
+          id: 1,
+          text: "hola bebes",
+          role: "user"
+        }
+      }
+    )
+    
+  }, [])
+  
+    console.log(state)
+  
   return (
     <>
       <div className="min-h-screen flex items-center justify-center bg-black">
