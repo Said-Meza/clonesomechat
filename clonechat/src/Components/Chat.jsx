@@ -1,6 +1,7 @@
 import { Header } from "./Header";
 import { Message } from "./Message";
 import PromptForm from "./PromptForm";
+import { History } from "./History";
 
 export const Chat = () => {
   return (
@@ -9,8 +10,9 @@ export const Chat = () => {
        <main className="min-h-[calc(100vh-91px)]">
         <section className="mx-auto flex max-w-4xl flex-col gap-4 p-4 text-white">
          
-        <Message role="ia" msg="hola"></Message>
-        <Message role="user" msg="soy como cr7 y messi"></Message>
+        <Message role="ia" msg=" Hola,¿cunetame algo interesante o dime en que te ayudo?"></Message>
+        
+        <History></History>
           
         </section>
       </main>
