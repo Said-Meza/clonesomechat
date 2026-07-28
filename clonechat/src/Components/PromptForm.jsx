@@ -1,79 +1,62 @@
-import { useContext,useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { ChatContext } from "../context/ChatContext";
-import { useOllama } from "../hooks/useOllama"
+import { fetchApi } from "../api/ApiFetch";
+const mPost = import.meta.env.VITE_URL_API_POST;
+const mGet = import.meta.env.VITE_URL_API_GET;
 
 const PromptForm = () => {
+  const { register, handleSubmit, reset } = useForm();
 
-    const { register, handleSubmit, reset } = useForm();
+  const { state, dispatch } = useContext(ChatContext);
 
-    const {state, dispatch } = useContext(ChatContext)
-    const { sendPrompt, loading, error } = useOllama()
-
-useEffect(() => {
-    console.log("Estado actualizado");
+  useEffect(() => {
+    // console.log("Estado actualizado");
     console.log(state);
-}, [state]);
+  }, [state]);
 
-    const handleMyfuntion = async (data) => {
-        try {
-            console.log(loading)
-            dispatch({
-                type: "ADD_MESSAGE",
-                payload: {
-                    role: "user",
-                    msg: data.msg
-                }
-            })
+  const handleMyfuntion = async (data) => {
+    try {
+      
+      await fetchApi(mPost,{msg:data.msg},"POST");
 
-            const result = await sendPrompt(data.msg)
+      const history = await fetchApi(mGet, null, "GET");
 
-            dispatch({
-                type: "ADD_MESSAGE",
-                payload: {
-                    role: "ia",
-                    msg: result.response
-                }
-            })
+      dispatch({
+        type: "LOAD_HISTORY",
+        payload: history,
+      });
 
-            // console.log(result.response)
-            // console.log(state)
-            // console.log(loading)
-
-        } catch (err) {
-        //    throw new Error(err.message);
-              console.error(err);
-              console.error(error);
-
-        } finally {
-            reset();
-
-        }
-
-
+    
+    } catch (err) {
+      //    throw new Error(err.message);
+      console.error(err);
+    } finally {
+      reset();
     }
+  };
 
-    return (
-        <footer className="w-full h-10  flex justify-center  bg-violet-900">
-            <form
-                onSubmit={handleSubmit(handleMyfuntion)}
-                method="post"
-                className=" flex w-3/5 rounded-4xl bg-yellow-300 "
-            >
-                <input
-                    type="text"
-                    name="msg"
-                    id=""
-                    {...register("msg", { required: true })}
-                    className="outline-none w-full p-3 text-amber-950"
-                />
-                <br></br>
+  return (
+    <footer className="w-full h-10  flex justify-center  bg-violet-900">
+      <form
+        onSubmit={handleSubmit(handleMyfuntion)}
+        method="post"
+        className=" flex w-3/5 rounded-4xl bg-yellow-300 "
+      >
+        <input
+          type="text"
+          name="msg"
+          id=""
+          {...register("msg", { required: true })}
+          className="outline-none w-full p-3 text-amber-950"
+        />
+        <br></br>
 
-                <input
-                    disabled={loading}
-                    type="submit"
-                    value="Enviar"
-                    className="
+        <input
+         
+          type="submit"
+          value="Enviar"
+          className="
                             bg-amber-950
                             text-amber-200
                             p-2
@@ -87,10 +70,10 @@ useEffect(() => {
                             hover:shadow-lg
                             active:scale-95
                     "
-                />
-            </form>
-        </footer>
-    );
+        />
+      </form>
+    </footer>
+  );
 };
 
 export default PromptForm;
