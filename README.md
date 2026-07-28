@@ -1,27 +1,14 @@
-# 🤖 ChatGPT Clone con React + Ollama
+# 🤖 CloneChat
 
-Un clon sencillo de ChatGPT desarrollado con **React**, **TailwindCSS**, **React Hook Form**, **Context API**, **useReducer** y **Ollama** para ejecutar un modelo de IA de manera local.
+CloneChat es una aplicación Full Stack inspirada en ChatGPT. Permite enviar mensajes a un modelo de inteligencia artificial ejecutado localmente mediante **Ollama**, guardar toda la conversación en **PostgreSQL** y visualizar el historial desde una interfaz desarrollada en **React**.
 
----
-
-# 📚 Objetivo del proyecto
-
-El propósito de este proyecto fue aprender a integrar una Inteligencia Artificial local utilizando Ollama y aplicar conceptos importantes de React como:
-
-- Componentes
-- Hooks personalizados
-- Context API
-- useReducer
-- React Hook Form
-- Variables de entorno
-- Consumo de APIs
-- Manejo de estado global
-
-Todo el proyecto fue realizado con fines educativos.
+El objetivo principal del proyecto fue aprender a integrar un frontend moderno con un backend en Node.js, una base de datos relacional y un modelo de inteligencia artificial, siguiendo una arquitectura cliente-servidor.
 
 ---
 
-# 🚀 Tecnologías utilizadas
+# 📚 Tecnologías utilizadas
+
+## Frontend
 
 - React
 - Vite
@@ -29,388 +16,190 @@ Todo el proyecto fue realizado con fines educativos.
 - React Hook Form
 - Context API
 - useReducer
-- Fetch API
+
+## Backend
+
+- Node.js
+- Express
+- PostgreSQL
+- pg
+- dotenv
+- cors
+
+## Inteligencia Artificial
+
 - Ollama
-- JavaScript (ES6)
+- Modelos compatibles (Gemma, DeepSeek, Llama, etc.)
 
 ---
 
-# 📁 Estructura del proyecto
+# 🏗 Arquitectura
 
 ```
-src/
+                React
+                  │
+                  │ HTTP
+                  ▼
+             Express API
+            /           \
+           /             \
+ PostgreSQL           Ollama
+```
+
+El frontend nunca se comunica directamente con Ollama.
+
+Toda la comunicación pasa por el servidor Express.
+
+---
+
+# 🚀 Funcionamiento
+
+El usuario escribe un mensaje desde React.
+
+```
+Usuario
+   │
+   ▼
+Formulario
+```
+
+El formulario envía una petición HTTP POST al servidor.
+
+```
+POST /api/chat
+```
+
+El servidor realiza las siguientes acciones:
+
+1. Guarda el mensaje del usuario.
+2. Consulta el modelo de IA mediante Ollama.
+3. Guarda la respuesta de la IA.
+4. Devuelve la respuesta al frontend.
+
+Después, el frontend solicita nuevamente el historial.
+
+```
+GET /history
+```
+
+Finalmente el historial completo se muestra en pantalla.
+
+---
+
+# 📂 Estructura del proyecto
+
+```
+clonechat/
+
 │
-├── components/
-│   ├── Header.jsx
-│   ├── History.jsx
-│   ├── Message.jsx
-│   └── PromptForm.jsx
+├── frontend/
+│   ├── src/
+│   │
+│   ├── components/
+│   ├── context/
+│   ├── hooks/
+│   ├── reducer/
+│   ├── services/
+│   ├── pages/
+│   └── App.jsx
 │
-├── context/
-│   ├── ChatContext.jsx
-│   └── ChatProvider.jsx
-│
-├── hooks/
-│   └── useOllama.jsx
-│
-├── reducers/
-│   └── ChatReducer.jsx
-│
-├── services/
-│   └── ollama.js
-│
-├── App.jsx
-└── main.jsx
+└── backend/
+    │
+    ├── database/
+    ├── services/
+    ├── .env
+    └── server.js
 ```
 
 ---
 
-# ⚙ Instalación
+# 🗄 Base de datos
 
-## 1. Clonar el proyecto
+La aplicación utiliza PostgreSQL.
 
-```bash
-git clone URL_DEL_REPOSITORIO
+Tabla principal:
+
+```
+messages
 ```
 
-Entrar al proyecto
+Campos
 
-```bash
-cd chatgpt-clone
+| Campo | Tipo |
+|--------|------|
+| id | SERIAL |
+| role | VARCHAR |
+| message | TEXT |
+| created_at | TIMESTAMP |
+
+---
+
+# 📡 Endpoints
+
+## Obtener historial
+
+```
+GET /history
+```
+
+Respuesta
+
+```json
+[
+    {
+        "id":1,
+        "role":"user",
+        "message":"Hola"
+    }
+]
 ```
 
 ---
 
-## 2. Instalar dependencias
-
-```bash
-npm install
-```
-
----
-
-## 3. Instalar React Hook Form
-
-```bash
-npm install react-hook-form
-```
-
----
-
-## 4. Instalar TailwindCSS
-
-Seguir la documentación oficial de Tailwind para proyectos con Vite.
-
----
-
-## 5. Instalar Ollama
-
-Descargar Ollama
-
-https://ollama.com
-
----
-
-## 6. Descargar un modelo
-
-Por ejemplo:
-
-```bash
-ollama pull gemma3:1b
-```
-
-También puede utilizarse:
-
-- llama3
-- phi3
-- mistral
-
----
-
-## 7. Ejecutar Ollama
-
-```bash
-ollama serve
-```
-
----
-
-# 🔐 Variables de entorno
-
-Crear un archivo llamado
+## Enviar mensaje
 
 ```
-.env
+POST /api/chat
 ```
 
-En la raíz del proyecto.
-
-Agregar:
-
-```env
-VITE_MODEL=gemma3:1b
-VITE_URL_API_OLLAMA=http://localhost:11434/api/generate
-```
-
----
-
-# ▶ Ejecutar el proyecto
-
-```bash
-npm run dev
-```
-
----
-
-# Arquitectura del proyecto
-
-El proyecto fue desarrollado siguiendo una arquitectura basada en responsabilidades.
-
-Cada archivo tiene una única función.
-
----
-
-# 1. Servicio (services)
-
-Archivo:
-
-```
-services/ollama.js
-```
-
-Responsabilidad:
-
-Consumir la API de Ollama utilizando Fetch API.
-
-Recibe:
-
-- prompt
-
-Envía:
+Body
 
 ```json
 {
-    "model":"gemma3:1b",
-    "prompt":"Hola",
-    "stream":false
+    "msg":"Hola IA"
 }
 ```
 
-Devuelve:
+Respuesta
 
-La respuesta de la IA.
-
----
-
-# 2. Hook personalizado
-
-Archivo:
-
-```
-hooks/useOllama.jsx
-```
-
-Responsabilidad:
-
-Centralizar toda la comunicación con Ollama.
-
-Estados utilizados:
-
-- loading
-- response
-- error
-
-Funciones:
-
-```
-sendPrompt()
-```
-
-Este hook evita repetir código dentro de los componentes.
-
----
-
-# 3. Reducer
-
-Archivo
-
-```
-reducers/ChatReducer.jsx
-```
-
-Responsabilidad:
-
-Modificar el estado global del chat.
-
-Estado inicial
-
-```javascript
+```json
 {
-    messages:[]
-}
-```
-
-Acciones
-
-```
-ADD_MESSAGE
-```
-
-Cada mensaje agregado posee la siguiente estructura
-
-```javascript
-{
-    role:"user",
-    msg:"Hola"
-}
-```
-
-o
-
-```javascript
-{
-    role:"ia",
-    msg:"Hola, ¿cómo estás?"
+    "response":"Hola ¿En qué puedo ayudarte?"
 }
 ```
 
 ---
 
-# 4. Context API
-
-Archivos
+# 🧠 Flujo completo
 
 ```
-ChatContext.jsx
-ChatProvider.jsx
-```
-
-Responsabilidad
-
-Compartir el historial del chat con toda la aplicación sin necesidad de pasar props entre componentes.
-
-Se utiliza:
-
-```
-useReducer()
-```
-
-para administrar el estado.
-
----
-
-# 5. PromptForm
-
-Responsabilidad
-
-Capturar el mensaje del usuario.
-
-Se utiliza:
-
-React Hook Form
-
-para simplificar el manejo del formulario.
-
-Flujo:
-
-Usuario escribe
+Usuario
 
 ↓
 
-Submit
+React
 
 ↓
 
-dispatch()
+POST /api/chat
 
 ↓
 
-sendPrompt()
+Express
 
 ↓
 
-Respuesta IA
-
-↓
-
-dispatch()
-
-↓
-
-Actualizar historial
-
----
-
-# 6. History
-
-Responsabilidad
-
-Mostrar todos los mensajes almacenados en el estado global.
-
-Utiliza
-
-```javascript
-state.messages.map(...)
-```
-
-para recorrer el historial.
-
----
-
-# 7. Message
-
-Responsabilidad
-
-Mostrar un único mensaje.
-
-Dependiendo del rol:
-
-```
-user
-```
-
-El mensaje aparece del lado derecho.
-
-```
-ia
-```
-
-El mensaje aparece del lado izquierdo.
-
----
-
-# Flujo completo del proyecto
-
-```
-Usuario escribe
-
-↓
-
-React Hook Form
-
-↓
-
-handleSubmit()
-
-↓
-
-dispatch(ADD_MESSAGE)
-
-↓
-
-Reducer
-
-↓
-
-Context actualiza el historial
-
-↓
-
-sendPrompt()
-
-↓
-
-Fetch API
+Guardar mensaje
 
 ↓
 
@@ -418,95 +207,158 @@ Ollama
 
 ↓
 
-Respuesta
+Respuesta IA
 
 ↓
 
-dispatch(ADD_MESSAGE)
+Guardar respuesta
 
 ↓
 
-Reducer
+React
 
 ↓
 
-History vuelve a renderizar
+GET /history
 
 ↓
 
-Se muestran ambos mensajes
+Context API
+
+↓
+
+History
+
+↓
+
+Pantalla
 ```
 
 ---
 
-# Diseño
+# ⚙ Variables de entorno
 
-La interfaz fue realizada utilizando TailwindCSS.
+## Frontend
 
-Se implementaron:
-
-- Header
-- Área de conversación
-- Mensajes alineados por rol
-- Footer
-- Input de texto
-- Botón de envío
+```
+VITE_API=http://localhost:3000
+```
 
 ---
 
-# Conceptos aprendidos
+## Backend
 
-Durante el desarrollo del proyecto se aplicaron los siguientes conceptos:
+```
+PORT=3000
 
-- Componentización
-- Props
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=*****
+DB_DATABASE=msg
+
+OLLAMA_URL=http://localhost:11434/api/generate
+OLLAMA_MODEL=gemma3:1b
+```
+
+---
+
+# ▶ Instalación
+
+## Clonar repositorio
+
+```bash
+git clone <repositorio>
+```
+
+---
+
+## Frontend
+
+```bash
+cd frontend
+
+npm install
+
+npm run dev
+```
+
+---
+
+## Backend
+
+```bash
+cd backend
+
+npm install
+
+npm run dev
+```
+
+---
+
+## Ejecutar Ollama
+
+```bash
+ollama serve
+```
+
+Posteriormente ejecutar el modelo.
+
+Ejemplo
+
+```bash
+ollama run gemma3:1b
+```
+
+---
+
+# Características implementadas
+
+- Comunicación React → Express
+- Comunicación Express → Ollama
+- Persistencia con PostgreSQL
+- Historial de conversaciones
+- Componentes reutilizables
 - Context API
 - useReducer
-- useContext
-- Hooks personalizados
 - React Hook Form
+- API REST
 - Variables de entorno
-- Fetch API
-- Async / Await
-- Manejo de errores
-- Estado global
-- Renderizado condicional
-- map()
-- TailwindCSS
+- Arquitectura Cliente-Servidor
 
 ---
 
-# Posibles mejoras
+# Mejoras futuras
 
-- Historial persistente usando LocalStorage.
-- Scroll automático.
-- Streaming de respuestas.
-- Markdown.
-- Resaltado de código.
-- Selector de modelos.
-- Tema oscuro/claro.
-- Sidebar con conversaciones.
-- Generación de imágenes.
-- Configuración del modelo.
+- Autenticación de usuarios
+- Múltiples conversaciones
+- Streaming de respuestas
+- Renderizado Markdown
+- Resaltado de código
+- Copiar respuestas
+- Tema oscuro/claro
+- Eliminación de conversaciones
+- Búsqueda dentro del historial
 
 ---
 
-# Resultado
+# Objetivo del proyecto
 
-El proyecto permite:
+Este proyecto fue desarrollado con fines de aprendizaje para comprender el desarrollo de aplicaciones Full Stack que integran:
 
-✅ Enviar mensajes.
+- React
+- Node.js
+- Express
+- PostgreSQL
+- APIs REST
+- Ollama
+- Inteligencia Artificial Local
 
-✅ Consumir una IA local mediante Ollama.
-
-✅ Mostrar las respuestas.
-
-✅ Administrar el historial mediante Context API y useReducer.
-
-✅ Separar correctamente la lógica en componentes reutilizables.
+Además, se aplicaron conceptos importantes como separación de responsabilidades, consumo de APIs, manejo de estado global y persistencia de información en base de datos.
 
 ---
 
 # Autor
 
-Proyecto desarrollado por **Said Meza** con fines educativos para fortalecer conocimientos en React, consumo de APIs y manejo de estado global.
+Desarrollado por **Said Meza** como proyecto de aprendizaje y práctica en desarrollo Full Stack con Inteligencia Artificial.
